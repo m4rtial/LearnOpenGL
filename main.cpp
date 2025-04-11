@@ -2,9 +2,10 @@
 #include <iostream>
 #include <stdio.h>
 #include "triangle.h"
+#include "shaders.h"
 
 int main()
 {
-	createOpenGL();
+	Shaders();
 	return 0;
 }

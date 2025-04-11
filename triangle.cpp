@@ -6,7 +6,7 @@
 #include "callbacks.h"
 #include "input.h"
 
-int createOpenGL()
+int WelcomeTriangle()
 {
 	/*
 		initialisation
@@ -39,17 +39,34 @@ int createOpenGL()
 		project variables
 	*/
 	// vertex array
-	float vertices[] = {	
-		-0.5f, -0.5f, 0.0f,
-		 0.5f, -0.5f, 0.0f, 
-		 0.0f,  0.5f, 0.0f  
+	float verticesOne[] = {
+		-0.9f, -0.5f, 0.0f,  // left 
+		-0.0f, -0.5f, 0.0f,  // right
+		-0.45f, 0.5f, 0.0f,  // top 
+	};
+	float verticesTwo[] = {
+		0.0f, -0.5f, 0.0f,  // left
+		0.9f, -0.5f, 0.0f,  // right
+		0.45f, 0.5f, 0.0f   // top 
 	};
 
 	// vertex buffer object
-	unsigned int VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	unsigned int VBOs[2];
+	unsigned int VAOs[2];
+	glGenBuffers(2, VBOs);
+	glGenVertexArrays(2, VAOs);
+	//
+	glBindVertexArray(VAOs[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesOne), verticesOne, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	//
+	glBindVertexArray(VAOs[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesTwo), verticesTwo, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
 	// vertex shader
 	const char* vertexShaderSource = "#version 330 core\n"
@@ -64,63 +81,75 @@ int createOpenGL()
 	glCompileShader(vertexShader);
 
 	// fragment shader
-	const char* fragmentShaderSource = "#version 330 core\n"
+	const char* pinkFragmentShaderSource = "#version 330 core\n"
 		"out vec4 FragColor;\n"
 		"void main()\n"
 		"{\n"
-		"   FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n"
+		"   FragColor = vec4(0.769, 0.243, 0.612, 1.0);\n"
 		"}\0";
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
+	unsigned int pinkFragmentShader;
+	pinkFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(pinkFragmentShader, 1, &pinkFragmentShaderSource, NULL);
+	glCompileShader(pinkFragmentShader);
 
-	// shader program
-	unsigned int shaderProgram;
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-	glUseProgram(shaderProgram);
+	// fragment shader
+	const char* yellowFragmentShaderSource = "#version 330 core\n"
+		"out vec4 FragColor;\n"
+		"void main()\n"
+		"{\n"
+		"   FragColor = vec4(1, 0.984, 0, 1.0);\n"
+		"}\0";
+	unsigned int yellowFragmentShader;
+	yellowFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(yellowFragmentShader, 1, &yellowFragmentShaderSource, NULL);
+	glCompileShader(yellowFragmentShader);
+
+	// shader programs
+	unsigned int pinkShaderProgram;
+	pinkShaderProgram = glCreateProgram();
+	glAttachShader(pinkShaderProgram, vertexShader);
+	glAttachShader(pinkShaderProgram, pinkFragmentShader);
+	glLinkProgram(pinkShaderProgram);
+	glUseProgram(pinkShaderProgram);
+	glDeleteShader(pinkFragmentShader);
+
+	unsigned int yellowShaderProgram;
+	yellowShaderProgram = glCreateProgram();
+	glAttachShader(yellowShaderProgram, vertexShader);
+	glAttachShader(yellowShaderProgram, yellowFragmentShader);
+	glLinkProgram(yellowShaderProgram);
+	glUseProgram(pinkShaderProgram);
 	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
-
-	// vertex array object
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-	// bind the vertex buffer object to the vertex array object
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-
-
+	glDeleteShader(yellowFragmentShader);
 
 	/*
 		render loop
 	*/
 	while (!glfwWindowShouldClose(window))
 	{
-		// execute every frame
+		// Process input every frame
 		process_input(window);
 
-		// rendering commands
+		// Clear the screen
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		/*
-			project commands
-		*/
-		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		// Render the first triangle using vaoOne
+		glUseProgram(pinkShaderProgram);
 
-		// end every frame
+		glBindVertexArray(VAOs[0]);  // Bind the first VAO
+		glDrawArrays(GL_TRIANGLES, 0, 3); // Draw only 3 vertices (one triangle)
+
+		glUseProgram(yellowShaderProgram);
+
+		glBindVertexArray(VAOs[1]);  // Bind the first VAO
+		glDrawArrays(GL_TRIANGLES, 0, 3); // Draw only 3 vertices (one triangle)
+
+		// End the frame
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-	}
 
+	}
 
 
 	/*
