@@ -22,6 +22,9 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{721e336c-06a8-4acf-9e95-b8f75eb9785e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Projects">
+      <UniqueIdentifier>{5ba6b9c1-6139-44e9-8f80-287136a9358d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -36,12 +39,21 @@
     <ClCompile Include="input.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
+    <ClCompile Include="triangle.cpp">
+      <Filter>Source Files\Projects</Filter>
+    </ClCompile>
+    <ClCompile Include="template.cpp">
+      <Filter>Source Files\Projects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callbacks.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
